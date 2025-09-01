@@ -1,0 +1,31 @@
+# .github/workflows/daily-run.yml
+name: Daily AI Policy Monitor
+
+on:
+  schedule:
+    - cron: '0 9 * * *' # 每天UTC时间9:00运行（即北京时间17:00）
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run the monitor script
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_AUTH_CODE: ${{ secrets.EMAIL_AUTH_CODE }}
+          EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+        run: python main.py
